@@ -1,0 +1,60 @@
+import { ServiceCategory } from "./types";
+
+export const SERVICE_CATEGORIES: ServiceCategory[] = [
+  {
+    id: "civil",
+    name_ar: "الأحوال المدنية والجوازات",
+    name_en: "Civil Status & Passports",
+    description_ar: "خدمات الهوية والجنسية والجوازات وشهادات الميلاد والوفاة",
+    description_en: "Identity, citizenship, passports, birth and death certificates",
+    icon: "passport",
+  },
+  {
+    id: "traffic",
+    name_ar: "السير والترخيص",
+    name_en: "Traffic & Licensing",
+    description_ar: "رخص القيادة وترخيص المركبات والمخالفات المرورية",
+    description_en: "Driver's licenses, vehicle registration, and traffic violations",
+    icon: "car",
+  },
+  {
+    id: "labor",
+    name_ar: "وزارة العمل",
+    name_en: "Ministry of Labor",
+    description_ar: "تصاريح العمل وحقوق العمال والتوظيف",
+    description_en: "Work permits, worker rights, and employment",
+    icon: "briefcase",
+  },
+  {
+    id: "social",
+    name_ar: "مؤسسة الضمان الاجتماعي",
+    name_en: "Social Security Corporation",
+    description_ar: "التقاعد والتأمين الصحي والضمان الاجتماعي",
+    description_en: "Retirement, health insurance, and social security",
+    icon: "shield",
+  },
+  {
+    id: "interior",
+    name_ar: "وزارة الداخلية",
+    name_en: "Ministry of Interior",
+    description_ar: "الإقامات والتأشيرات والشؤون الداخلية",
+    description_en: "Residencies, visas, and internal affairs",
+    icon: "building",
+  },
+  {
+    id: "telecom",
+    name_ar: "هيئة تنظيم الاتصالات",
+    name_en: "Telecommunications Regulatory Commission",
+    description_ar: "خدمات الاتصالات والإنترنت والتراخيص",
+    description_en: "Telecommunications, internet services, and licenses",
+    icon: "signal",
+  },
+  {
+    id: "amman",
+    name_ar: "أمانة عمان الكبرى",
+    name_en: "Greater Amman Municipality",
+    description_ar: "خدمات البلدية والتنظيم والرخص المهنية",
+    description_en: "Municipal services, zoning, and professional licenses",
+    icon: "city",
+  },
+];
