@@ -1,10 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/lib/i18n";
 
 export default function Navbar() {
   const { language, setLanguage, dir, t } = useLanguage();
+  const pathname = usePathname();
+
+  const links = [
+    { href: "/", label: t("nav.home") },
+    { href: "/chat", label: t("nav.chat") },
+    { href: "/services", label: t("nav.services") },
+    { href: "/reviews", label: t("nav.reviews") },
+    { href: "/about", label: t("nav.about") },
+  ];
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname?.startsWith(href);
 
   return (
     <nav
@@ -24,27 +37,30 @@ export default function Navbar() {
 
         {/* Nav Links */}
         <div className="hidden items-center gap-6 md:flex">
-          <Link href="/" className="text-sm font-medium text-gray-700 transition hover:text-[#006633]">
-            {t("nav.home")}
-          </Link>
-          <Link href="/chat" className="text-sm font-medium text-gray-700 transition hover:text-[#006633]">
-            {t("nav.chat")}
-          </Link>
-          <Link href="/services" className="text-sm font-medium text-gray-700 transition hover:text-[#006633]">
-            {t("nav.services")}
-          </Link>
-          <Link href="/reviews" className="text-sm font-medium text-gray-700 transition hover:text-[#006633]">
-            {t("nav.reviews")}
-          </Link>
-          <Link href="/about" className="text-sm font-medium text-gray-700 transition hover:text-[#006633]">
-            {t("nav.about")}
-          </Link>
+          {links.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`relative text-sm font-medium transition hover:text-[#006633] ${
+                  active ? "text-[#006633]" : "text-gray-700"
+                }`}
+              >
+                {link.label}
+                {active && (
+                  <span className="absolute -bottom-[14px] left-0 right-0 h-0.5 rounded-full bg-[#006633]" />
+                )}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Language Toggle */}
         <button
           onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
-          className="rounded-lg border border-[#006633] px-3 py-1.5 text-sm font-medium text-[#006633] transition hover:bg-[#006633] hover:text-white"
+          className="cursor-pointer rounded-lg border border-[#006633] px-3 py-1.5 text-sm font-medium text-[#006633] transition hover:bg-[#006633] hover:text-white"
         >
           {language === "ar" ? "EN" : "عربي"}
         </button>

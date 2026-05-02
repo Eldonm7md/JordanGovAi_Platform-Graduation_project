@@ -82,6 +82,11 @@ const translations: Record<string, Record<Language, string>> = {
   "chat.newChat": { ar: "محادثة جديدة", en: "New Chat" },
   "chat.history": { ar: "المحادثات السابقة", en: "Previous Chats" },
   "chat.thinking": { ar: "جاري التفكير...", en: "Thinking..." },
+  "chat.suggestionsTitle": { ar: "جرب أن تسأل", en: "Try asking" },
+  "chat.suggestion1": { ar: "كيف أجدد جواز السفر؟", en: "How do I renew my passport?" },
+  "chat.suggestion2": { ar: "ما هي خطوات تسجيل شركة جديدة؟", en: "How do I register a new company?" },
+  "chat.suggestion3": { ar: "كيف أحصل على شهادة عدم محكومية؟", en: "How do I get a non-conviction certificate?" },
+  "chat.suggestion4": { ar: "ما هي رسوم تجديد رخصة القيادة؟", en: "What are the driver's license renewal fees?" },
 
   // Footer
   "footer.rights": { ar: "جميع الحقوق محفوظة", en: "All rights reserved" },

@@ -29,6 +29,8 @@ export interface ServiceCategory {
   description_ar: string;
   description_en: string;
   icon: string;
+  starter_ar: string;
+  starter_en: string;
 }
 
 export interface Review {

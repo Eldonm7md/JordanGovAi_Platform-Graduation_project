@@ -14,7 +14,9 @@ export default function ServicesPage() {
         {SERVICE_CATEGORIES.map((service) => (
           <Link
             key={service.id}
-            href={`/chat?service=${service.id}`}
+            href={`/chat?service=${service.id}&prompt=${encodeURIComponent(
+              language === "ar" ? service.starter_ar : service.starter_en
+            )}`}
             className="group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition hover:border-[#006633]/30 hover:shadow-lg"
           >
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#006633]/5 text-xl transition group-hover:bg-[#006633]/10">

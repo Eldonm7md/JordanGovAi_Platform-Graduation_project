@@ -8,6 +8,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "خدمات الهوية والجنسية والجوازات وشهادات الميلاد والوفاة",
     description_en: "Identity, citizenship, passports, birth and death certificates",
     icon: "passport",
+    starter_ar: "ما هي خدمات دائرة الأحوال المدنية والجوازات وكيف يمكنني تجديد جواز السفر أو استخراج شهادة ميلاد؟",
+    starter_en: "What services does the Civil Status & Passports Department offer, and how do I renew my passport or obtain a birth certificate?",
   },
   {
     id: "traffic",
@@ -16,6 +18,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "رخص القيادة وترخيص المركبات والمخالفات المرورية",
     description_en: "Driver's licenses, vehicle registration, and traffic violations",
     icon: "car",
+    starter_ar: "كيف يمكنني تجديد رخصة القيادة أو ترخيص مركبتي ودفع المخالفات المرورية؟",
+    starter_en: "How do I renew my driver's license, register my vehicle, and pay traffic violations?",
   },
   {
     id: "labor",
@@ -24,6 +28,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "تصاريح العمل وحقوق العمال والتوظيف",
     description_en: "Work permits, worker rights, and employment",
     icon: "briefcase",
+    starter_ar: "ما هي خطوات الحصول على تصريح عمل وما هي حقوق العمال في الأردن؟",
+    starter_en: "How do I obtain a work permit, and what are workers' rights in Jordan?",
   },
   {
     id: "social",
@@ -32,6 +38,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "التقاعد والتأمين الصحي والضمان الاجتماعي",
     description_en: "Retirement, health insurance, and social security",
     icon: "shield",
+    starter_ar: "ما هي خدمات الضمان الاجتماعي وكيف أتقدم بطلب للتقاعد أو التأمين الصحي؟",
+    starter_en: "What services does Social Security offer, and how do I apply for retirement or health insurance?",
   },
   {
     id: "interior",
@@ -40,6 +48,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "الإقامات والتأشيرات والشؤون الداخلية",
     description_en: "Residencies, visas, and internal affairs",
     icon: "building",
+    starter_ar: "كيف يمكنني الحصول على إقامة أو تأشيرة في الأردن وما هي المتطلبات؟",
+    starter_en: "How do I obtain a residency or visa in Jordan, and what are the requirements?",
   },
   {
     id: "telecom",
@@ -48,6 +58,8 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "خدمات الاتصالات والإنترنت والتراخيص",
     description_en: "Telecommunications, internet services, and licenses",
     icon: "signal",
+    starter_ar: "ما هي خدمات هيئة تنظيم الاتصالات وكيف أقدم شكوى تتعلق بمزود الاتصالات؟",
+    starter_en: "What services does the Telecommunications Regulatory Commission offer, and how do I file a complaint about a telecom provider?",
   },
   {
     id: "amman",
@@ -56,5 +68,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     description_ar: "خدمات البلدية والتنظيم والرخص المهنية",
     description_en: "Municipal services, zoning, and professional licenses",
     icon: "city",
+    starter_ar: "كيف يمكنني الحصول على رخصة مهن أو تسوية المخالفات لدى أمانة عمان؟",
+    starter_en: "How do I obtain a professional license or settle violations with Greater Amman Municipality?",
   },
 ];

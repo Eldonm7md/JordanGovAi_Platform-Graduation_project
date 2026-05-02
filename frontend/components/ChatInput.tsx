@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, FormEvent } from "react";
+import { useEffect, useRef, useState, FormEvent } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { transcribeAudio } from "@/lib/api";
 
@@ -8,15 +8,39 @@ interface ChatInputProps {
   onSend: (message: string) => void;
   disabled?: boolean;
   language: string;
+  pendingValue?: string | null;
+  onPendingConsumed?: () => void;
 }
 
-export default function ChatInput({ onSend, disabled, language }: ChatInputProps) {
+export default function ChatInput({
+  onSend,
+  disabled,
+  language,
+  pendingValue,
+  onPendingConsumed,
+}: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { dir, t } = useLanguage();
+
+  useEffect(() => {
+    if (pendingValue) {
+      setMessage(pendingValue);
+      onPendingConsumed?.();
+      requestAnimationFrame(() => {
+        const el = inputRef.current;
+        if (el) {
+          el.focus();
+          const len = el.value.length;
+          el.setSelectionRange(len, len);
+        }
+      });
+    }
+  }, [pendingValue, onPendingConsumed]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -107,6 +131,7 @@ export default function ChatInput({ onSend, disabled, language }: ChatInputProps
       </button>
 
       <input
+        ref={inputRef}
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}

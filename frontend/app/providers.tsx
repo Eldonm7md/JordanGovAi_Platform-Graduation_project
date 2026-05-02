@@ -1,12 +1,15 @@
 "use client";
 
 import { ReactNode, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 function LayoutInner({ children }: { children: ReactNode }) {
   const { language, dir } = useLanguage();
+  const pathname = usePathname();
+  const hideFooter = pathname?.startsWith("/chat");
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -17,7 +20,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
     <>
       <Navbar />
       <main className="flex-1">{children}</main>
-      <Footer />
+      {!hideFooter && <Footer />}
     </>
   );
 }

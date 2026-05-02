@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
@@ -13,8 +14,10 @@ interface Message {
   sources?: Array<{ filename: string; page?: number }>;
 }
 
-export default function ChatPage() {
+function ChatPageInner() {
   const { language, dir, t } = useLanguage();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>(() => [
     {
       id: "welcome",
@@ -23,7 +26,9 @@ export default function ChatPage() {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const consumedPromptRef = useRef<string | null>(null);
 
   // Auto-scroll
   useEffect(() => {
@@ -79,18 +84,31 @@ export default function ChatPage() {
     }
   };
 
+  // Pre-fill input with a starter prompt from /services?prompt=...
+  useEffect(() => {
+    const prompt = searchParams.get("prompt");
+    if (!prompt || consumedPromptRef.current === prompt) return;
+    consumedPromptRef.current = prompt;
+    setPendingPrompt(prompt);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("prompt");
+    params.delete("service");
+    const qs = params.toString();
+    router.replace(qs ? `/chat?${qs}` : "/chat");
+  }, [searchParams, router]);
+
   return (
     <div dir={dir} className="flex h-[calc(100vh-65px)]">
       {/* Sidebar */}
-      <aside className="hidden w-64 flex-shrink-0 border-e border-gray-200 bg-gray-50 p-4 md:block">
+      <aside className="hidden w-64 flex-shrink-0 flex-col border-e border-gray-200 bg-gray-50 p-4 md:flex">
         <button
           type="button"
           onClick={startNewChat}
-          className="mb-4 w-full rounded-lg bg-[#006633] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#005528]"
+          className="mb-4 w-full cursor-pointer rounded-lg bg-[#006633] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#005528]"
         >
           + {t("chat.newChat")}
         </button>
-        <div>
+        <div className="flex-1">
           <h3 className="mb-2 text-xs font-semibold uppercase text-gray-400">
             {t("chat.history")}
           </h3>
@@ -98,12 +116,26 @@ export default function ChatPage() {
             {language === "ar" ? "لا توجد محادثات سابقة" : "No previous chats"}
           </p>
         </div>
+        <div className="mt-4 border-t border-gray-200 pt-4 text-center">
+          <div className="mb-1 flex items-center justify-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded bg-[#006633]">
+              <span className="text-[10px] font-bold text-white">JG</span>
+            </div>
+            <span className="text-xs font-semibold text-[#006633]">
+              JordanGov AI Assistant
+            </span>
+          </div>
+          <p className="text-[11px] text-gray-500">{t("footer.project")}</p>
+          <p className="mt-0.5 text-[10px] text-gray-400">
+            &copy; 2026 {t("footer.rights")}
+          </p>
+        </div>
       </aside>
 
       {/* Chat Area */}
       <div className="flex flex-1 flex-col">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 chat-scroll">
+        <div className="flex-1 overflow-y-auto overscroll-contain p-4 chat-scroll">
           {messages.map((msg) => (
             <ChatMessage
               key={msg.id}
@@ -112,6 +144,31 @@ export default function ChatPage() {
               sources={msg.sources}
             />
           ))}
+
+          {messages.length === 1 && !isLoading && (
+            <div className="mt-2 mb-4">
+              <p className="mb-3 text-xs font-semibold uppercase text-gray-400">
+                {t("chat.suggestionsTitle")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  t("chat.suggestion1"),
+                  t("chat.suggestion2"),
+                  t("chat.suggestion3"),
+                  t("chat.suggestion4"),
+                ].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => handleSend(s)}
+                    className="cursor-pointer rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 transition hover:border-[#006633] hover:bg-[#006633]/5 hover:text-[#006633]"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Loading indicator */}
           {isLoading && (
@@ -130,8 +187,22 @@ export default function ChatPage() {
         </div>
 
         {/* Input */}
-        <ChatInput onSend={handleSend} disabled={isLoading} language={language} />
+        <ChatInput
+          onSend={handleSend}
+          disabled={isLoading}
+          language={language}
+          pendingValue={pendingPrompt}
+          onPendingConsumed={() => setPendingPrompt(null)}
+        />
       </div>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChatPageInner />
+    </Suspense>
   );
 }
