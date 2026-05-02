@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Dict, Optional, List
 
 
 # Chat schemas
@@ -27,7 +27,10 @@ class RAGChatResponse(BaseModel):
 
 
 # Health check
+# `status` is one of "ok" | "partial" | "down". `services` reports per
+# upstream component so the frontend can show fine-grained state.
 class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
+    services: Dict[str, str] = {}

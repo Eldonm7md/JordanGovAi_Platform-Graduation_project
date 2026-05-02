@@ -1,39 +1,193 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import H from "@/components/ui/H";
+import Body from "@/components/ui/Body";
+import Mono from "@/components/ui/Mono";
+import Pill from "@/components/ui/Pill";
 
 export default function ReviewsPage() {
-  const { language, dir } = useLanguage();
+  const { dir, t } = useLanguage();
+  const ar = dir === "rtl";
+
+  // Distribution band — placeholder structure per the design KPI pattern.
+  const distribution: Array<[number, number]> = [
+    [5, 0],
+    [4, 0],
+    [3, 0],
+    [2, 0],
+    [1, 0],
+  ];
 
   return (
-    <div dir={dir} className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">
-        {language === "ar" ? "التقييمات والمراجعات" : "Reviews & Feedback"}
-      </h1>
+    <div dir={dir} style={{ background: "var(--color-bg)" }}>
+      {/* Page header */}
+      <section
+        style={{
+          padding: "56px 56px 40px",
+          background: "var(--color-panel)",
+          borderBottom: "1px solid var(--color-rule-soft)",
+        }}
+      >
+        <Mono style={{ fontSize: 10.5, color: "var(--color-primary)" }}>
+          {t("reviews.kicker")}
+        </Mono>
+        <H
+          level={1}
+          style={{
+            fontSize: ar ? 44 : 52,
+            lineHeight: 1.05,
+            marginTop: 14,
+            marginBottom: 16,
+          }}
+        >
+          {t("reviews.title")}
+        </H>
+        <Body style={{ fontSize: 16, maxWidth: 640 }}>
+          {t("reviews.intro")}
+        </Body>
+      </section>
 
-      {/* Average Rating */}
-      <div className="mb-8 rounded-2xl bg-white border border-gray-100 p-6 shadow-sm text-center">
-        <div className="text-4xl font-bold text-[#006633]">4.5</div>
-        <div className="mt-1 flex justify-center gap-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <svg key={star} className={`h-5 w-5 ${star <= 4 ? "text-yellow-400" : "text-gray-200"}`} fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
+      {/* Average + distribution band */}
+      <section
+        className="grid"
+        style={{
+          gridTemplateColumns: "1fr 2fr",
+          borderBottom: "1px solid var(--color-rule-soft)",
+          background: "var(--color-panel)",
+        }}
+      >
+        <div
+          style={{
+            padding: 28,
+            borderInlineEnd: "1px solid var(--color-rule-soft)",
+          }}
+        >
+          <Mono
+            as="div"
+            className="block mb-3"
+            style={{ fontSize: 10, color: "var(--color-ink-mute)" }}
+          >
+            {t("reviews.avgLabel")}
+          </Mono>
+          <div className="flex items-baseline gap-3">
+            <span
+              className="block tabular"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: 64,
+                fontWeight: 400,
+                color: "var(--color-ink)",
+                letterSpacing: "-0.025em",
+                lineHeight: 1,
+              }}
+            >
+              4.5
+            </span>
+            <span
+              className="inline-flex"
+              style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--color-ink-mute)" }}
+            >
+              / 5.0
+            </span>
+          </div>
+          <Mono
+            as="div"
+            className="block mt-3"
+            style={{ fontSize: 10.5, color: "var(--color-ink-mute)" }}
+          >
+            {t("reviews.basedOn")} 0 {t("reviews.reviewsLabel")}
+          </Mono>
+        </div>
+
+        <div style={{ padding: 28 }}>
+          <Mono
+            as="div"
+            className="block mb-3"
+            style={{ fontSize: 10, color: "var(--color-ink-mute)" }}
+          >
+            DISTRIBUTION
+          </Mono>
+          {distribution.map(([star, count], i, a) => (
+            <div
+              key={star}
+              className="grid items-center"
+              style={{
+                gridTemplateColumns: "40px 1fr 60px",
+                gap: 14,
+                padding: "10px 0",
+                borderBottom:
+                  i < a.length - 1
+                    ? "1px solid var(--color-rule-soft)"
+                    : "none",
+              }}
+            >
+              <Mono
+                className="tabular"
+                style={{ fontSize: 11, color: "var(--color-ink)" }}
+              >
+                0{star} ★
+              </Mono>
+              <div
+                className="relative"
+                style={{ height: 4, background: "var(--color-bg-alt)" }}
+              >
+                <div
+                  style={{
+                    width: `${count}%`,
+                    height: "100%",
+                    background: "var(--color-primary)",
+                  }}
+                />
+              </div>
+              <Mono
+                className="tabular"
+                style={{
+                  fontSize: 10,
+                  color: "var(--color-ink-mute)",
+                  textAlign: "end",
+                }}
+              >
+                {count}
+              </Mono>
+            </div>
           ))}
         </div>
-        <p className="mt-2 text-sm text-gray-500">
-          {language === "ar" ? "بناءً على 0 تقييم" : "Based on 0 reviews"}
-        </p>
-      </div>
+      </section>
 
-      {/* Placeholder */}
-      <div className="rounded-2xl border border-dashed border-gray-300 p-12 text-center">
-        <p className="text-gray-400">
-          {language === "ar"
-            ? "سيتم عرض التقييمات هنا بعد تفعيل النظام"
-            : "Reviews will be displayed here once the system is active"}
-        </p>
-      </div>
+      {/* Empty state list */}
+      <section style={{ padding: "48px 56px" }}>
+        <div
+          className="flex justify-between items-end mb-6"
+          style={{
+            paddingBottom: 18,
+            borderBottom: "1px solid var(--color-rule-soft)",
+          }}
+        >
+          <H level={2} style={{ fontSize: 30 }}>
+            {ar ? "أحدث التقييمات" : "Latest reviews"}
+          </H>
+          <Pill tone="neutral">00</Pill>
+        </div>
+        <div
+          className="flex items-center justify-center"
+          style={{
+            border: "1px dashed var(--color-rule-soft)",
+            background: "var(--color-panel)",
+            padding: "64px 24px",
+          }}
+        >
+          <Body
+            style={{
+              fontSize: 14,
+              color: "var(--color-ink-mute)",
+              textAlign: "center",
+            }}
+          >
+            {t("reviews.empty")}
+          </Body>
+        </div>
+      </section>
     </div>
   );
 }

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, FormEvent } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { transcribeAudio } from "@/lib/api";
+import Mono from "@/components/ui/Mono";
+import Btn from "@/components/ui/Btn";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -26,6 +28,7 @@ export default function ChatInput({
   const chunksRef = useRef<BlobPart[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const { dir, t } = useLanguage();
+  const ar = dir === "rtl";
 
   useEffect(() => {
     if (pendingValue) {
@@ -51,18 +54,14 @@ export default function ChatInput({
   };
 
   const handleVoiceInput = async () => {
-    if (disabled || isTranscribing) {
-      return;
-    }
+    if (disabled || isTranscribing) return;
 
     if (isRecording) {
       recorderRef.current?.stop();
       return;
     }
 
-    if (!navigator.mediaDevices?.getUserMedia) {
-      return;
-    }
+    if (!navigator.mediaDevices?.getUserMedia) return;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -71,24 +70,18 @@ export default function ChatInput({
       recorderRef.current = recorder;
 
       recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
+        if (event.data.size > 0) chunksRef.current.push(event.data);
       };
 
       recorder.onstop = async () => {
         stream.getTracks().forEach((track) => track.stop());
         setIsRecording(false);
         setIsTranscribing(true);
-
         try {
           const audio = new Blob(chunksRef.current, { type: "audio/webm" });
           const result = await transcribeAudio(audio, language);
           const transcript = result.text.trim();
-
-          if (transcript) {
-            setMessage(transcript);
-          }
+          if (transcript) setMessage(transcript);
         } finally {
           setIsTranscribing(false);
           recorderRef.current = null;
@@ -108,26 +101,47 @@ export default function ChatInput({
     <form
       onSubmit={handleSubmit}
       dir={dir}
-      className="flex items-center gap-2 border-t border-gray-200 bg-white px-4 py-3"
+      className="flex items-center gap-3"
+      style={{
+        padding: "14px 20px",
+        background: "var(--color-panel)",
+      }}
     >
       <button
         type="button"
         onClick={handleVoiceInput}
         disabled={disabled || isTranscribing}
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
-          isRecording
-            ? "bg-red-100 text-red-600"
-            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-        } disabled:opacity-40`}
-        title={dir === "rtl" ? "تسجيل صوتي" : "Voice input"}
-        aria-label={dir === "rtl" ? "تسجيل صوتي" : "Voice input"}
+        className="grid place-items-center cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{
+          width: 38,
+          height: 38,
+          background: isRecording ? "var(--color-gold)" : "var(--color-bg)",
+          border: `1px solid ${isRecording ? "var(--color-gold)" : "var(--color-rule-soft)"}`,
+        }}
+        aria-label={t("chat.voiceLabel")}
+        title={t("chat.voiceLabel")}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-          <line x1="12" y1="19" x2="12" y2="23" />
-          <line x1="8" y1="23" x2="16" y2="23" />
-        </svg>
+        {isRecording ? (
+          <span
+            className="recording-dot rounded-full"
+            style={{ width: 10, height: 10, background: "#fff" }}
+          />
+        ) : (
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="var(--color-ink-soft)"
+            strokeWidth="1.8"
+            aria-hidden
+          >
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
+        )}
       </button>
 
       <input
@@ -135,21 +149,27 @@ export default function ChatInput({
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder={isTranscribing ? "Transcribing..." : t("chat.placeholder")}
+        placeholder={isTranscribing ? t("chat.transcribing") : t("chat.placeholder")}
         disabled={disabled || isTranscribing}
-        className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm outline-none transition focus:border-[#006633] focus:ring-1 focus:ring-[#006633]/20 disabled:opacity-50"
+        className="flex-1 bg-transparent border-0 outline-none disabled:opacity-50"
+        style={{
+          fontSize: 15,
+          fontFamily: ar ? "var(--font-arabic)" : "var(--font-sans)",
+          padding: "8px 4px",
+          color: "var(--color-ink)",
+        }}
       />
 
-      <button
+      <Mono style={{ fontSize: 9.5, color: "var(--color-ink-mute)" }}>⏎</Mono>
+
+      <Btn
         type="submit"
+        kind="primary"
         disabled={!message.trim() || disabled || isTranscribing}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#006633] text-white transition hover:bg-[#005528] disabled:opacity-40"
+        style={{ padding: "10px 18px", fontSize: 13 }}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="22" y1="2" x2="11" y2="13" />
-          <polygon points="22 2 15 22 11 13 2 9 22 2" />
-        </svg>
-      </button>
+        {t("chat.send")}
+      </Btn>
     </form>
   );
 }

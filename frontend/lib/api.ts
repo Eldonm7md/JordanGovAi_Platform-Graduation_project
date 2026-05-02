@@ -46,8 +46,20 @@ export async function sendRAGMessage(data: ChatRequest): Promise<ChatResponse> {
   return res.json();
 }
 
-export async function healthCheck(): Promise<{ status: string }> {
-  const res = await fetch(`${API_BASE}/health`);
+export interface HealthResponse {
+  status: "ok" | "partial" | "down";
+  service: string;
+  version: string;
+  services: {
+    backend?: "ok" | "down";
+    ai?: "ok" | "down";
+    stt?: "ok" | "down";
+  };
+}
+
+export async function healthCheck(signal?: AbortSignal): Promise<HealthResponse> {
+  const res = await fetch(`${API_BASE}/health`, { signal });
+  if (!res.ok) throw new Error(`Health request failed: ${res.status}`);
   return res.json();
 }
 
@@ -68,6 +80,32 @@ export async function transcribeAudio(
     throw new Error(`Transcription request failed: ${res.status}`);
   }
 
+  return res.json();
+}
+
+interface TitleRequest {
+  user_message: string;
+  assistant_response: string;
+  language: string;
+}
+
+interface TitleResponse {
+  title: string;
+}
+
+export async function generateTitle(
+  data: TitleRequest,
+  signal?: AbortSignal,
+): Promise<TitleResponse> {
+  const res = await fetch(`${API_BASE}/chat/title`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+    signal,
+  });
+  if (!res.ok) {
+    throw new Error(`Title request failed: ${res.status}`);
+  }
   return res.json();
 }
 

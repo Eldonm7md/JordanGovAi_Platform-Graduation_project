@@ -1,58 +1,160 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import Mono from "@/components/ui/Mono";
+
+interface Source {
+  filename: string;
+  page?: number;
+}
 
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
-  sources?: Array<{ filename: string; page?: number }>;
+  ts: number;
+  sources?: Source[];
 }
 
-export default function ChatMessage({ role, content, sources }: ChatMessageProps) {
-  const { dir } = useLanguage();
-  const isUser = role === "user";
+function formatHM(ts: number, language: "ar" | "en"): string {
+  const locale = language === "ar" ? "ar-EG" : "en-GB";
+  return new Intl.DateTimeFormat(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(ts));
+}
 
-  return (
-    <div dir={dir} className={`flex w-full ${isUser ? "justify-end" : "justify-start"} mb-4`}>
-      <div
-        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-          isUser
-            ? "bg-[#006633] text-white rounded-br-sm"
-            : "bg-gray-100 text-gray-800 rounded-bl-sm"
-        }`}
-      >
-        {/* Avatar indicator */}
-        <div className="mb-1 flex items-center gap-2">
-          <div
-            className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-              isUser ? "bg-white/20 text-white" : "bg-[#006633]/10 text-[#006633]"
-            }`}
+export default function ChatMessage({
+  role,
+  content,
+  ts,
+  sources,
+}: ChatMessageProps) {
+  const { dir, t, language } = useLanguage();
+  const ar = dir === "rtl";
+  const time = formatHM(ts, language);
+
+  if (role === "user") {
+    // Always sit on the trailing edge — flex-end resolves to right in LTR
+    // and to left in RTL, which is the standard chat convention.
+    return (
+      <div className="flex items-start justify-end">
+        <div
+          style={{
+            background: "var(--color-primary-deep)",
+            color: "#fff",
+            padding: "12px 18px",
+            maxWidth: "70%",
+          }}
+        >
+          <Mono
+            as="div"
+            className="block mb-1"
+            style={{ fontSize: 9.5, color: "rgba(255,255,255,0.55)" }}
           >
-            {isUser ? "U" : "AI"}
-          </div>
-          <span className={`text-xs ${isUser ? "text-white/70" : "text-gray-400"}`}>
-            {isUser ? (dir === "rtl" ? "أنت" : "You") : (dir === "rtl" ? "المساعد" : "Assistant")}
+            {t("chat.you")} · {time}
+          </Mono>
+          <span
+            className="block whitespace-pre-wrap"
+            style={{
+              fontSize: 15,
+              lineHeight: 1.55,
+              fontFamily: ar ? "var(--font-arabic)" : "var(--font-sans)",
+            }}
+          >
+            {content}
           </span>
         </div>
+      </div>
+    );
+  }
 
-        {/* Message content */}
-        <div className="whitespace-pre-wrap text-sm leading-relaxed">{content}</div>
+  return (
+    <div className="flex items-start gap-3.5">
+      <div
+        className="grid place-items-center flex-shrink-0"
+        style={{
+          width: 32,
+          height: 32,
+          background: "var(--color-primary)",
+          color: "#fff",
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          fontWeight: 600,
+        }}
+      >
+        AI
+      </div>
+      <div className="flex-1 pt-0.5 min-w-0">
+        <Mono
+          as="div"
+          className="block mb-2"
+          style={{ fontSize: 9.5, color: "var(--color-ink-mute)" }}
+        >
+          {t("chat.assistant")} · {time}
+        </Mono>
+        <p
+          className="m-0 whitespace-pre-wrap break-words"
+          style={{
+            fontSize: 15,
+            lineHeight: 1.65,
+            color: "var(--color-ink)",
+            fontFamily: ar ? "var(--font-arabic)" : "var(--font-sans)",
+          }}
+        >
+          {content}
+        </p>
 
-        {/* Sources */}
         {sources && sources.length > 0 && (
-          <div className="mt-2 border-t border-gray-200 pt-2">
-            <p className="text-xs text-gray-500 mb-1">
-              {dir === "rtl" ? "المصادر:" : "Sources:"}
-            </p>
-            {sources.map((source, idx) => (
-              <span
-                key={idx}
-                className="inline-block mr-2 mb-1 rounded bg-white/80 px-2 py-0.5 text-xs text-gray-600"
-              >
-                {source.filename}
-                {source.page && ` (p.${source.page})`}
-              </span>
-            ))}
+          <div className="mt-4">
+            <Mono
+              as="div"
+              className="block mb-2"
+              style={{ fontSize: 10, color: "var(--color-ink-mute)" }}
+            >
+              {t("chat.officialSources")} · {String(sources.length).padStart(2, "0")}
+            </Mono>
+            <div className="grid gap-1.5">
+              {sources.map((s, i) => (
+                <div
+                  key={`${s.filename}-${i}`}
+                  className="flex justify-between items-center"
+                  style={{
+                    padding: "8px 12px",
+                    background: "var(--color-panel)",
+                    border: "1px solid var(--color-rule-soft)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                  }}
+                >
+                  <span className="inline-flex gap-2 items-center min-w-0">
+                    <span
+                      className="flex-shrink-0"
+                      style={{
+                        width: 4,
+                        height: 4,
+                        background: "var(--color-primary)",
+                        display: "inline-block",
+                      }}
+                    />
+                    <span
+                      className="truncate"
+                      style={{ color: "var(--color-ink)" }}
+                    >
+                      {s.filename}
+                    </span>
+                  </span>
+                  {s.page != null && (
+                    <span
+                      className="flex-shrink-0"
+                      style={{ color: "var(--color-ink-mute)" }}
+                    >
+                      {language === "ar" ? `ص. ${s.page}` : `p. ${s.page}`}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

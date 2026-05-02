@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { LanguageProvider, useLanguage } from "@/lib/i18n";
-import Navbar from "@/components/Navbar";
+import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 
 function LayoutInner({ children }: { children: ReactNode }) {
@@ -18,7 +18,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <Navbar />
+      <TopBar />
       <main className="flex-1">{children}</main>
       {!hideFooter && <Footer />}
     </>
